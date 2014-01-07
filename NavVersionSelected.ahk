@@ -15,6 +15,7 @@ Mode=0
 ;######################################################################################
 
 ;------------ Start of auto-execute section ------------
+GoSub, FindCurrentVersion
 Menu, MainMenu, add, Dummy, ReloadMenu ;Dummy menu entry else DeleteAll fails.
 GoSub, ReloadMenu
 
@@ -25,7 +26,7 @@ Return
 AddStandardMenuItems:
 ;Stock menu entries
 Menu, MainMenu, add, Add version to INI, AddVersion
-Menu, MainMenu, add, ReloadMenu, ReloadMenu
+;Menu, MainMenu, add, ReloadMenu, ReloadMenu
 Return
 
 AddVersion:
@@ -98,7 +99,28 @@ Else
 		MsgBox, Error changing Path key at SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%FileName%.
 }
 GoSub, ReloadMenu
-;Return
+Return
+
+FindCurrentVersion:
+;Find current versions from RegDB
+RegRead, CurrentDynNav, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Microsoft.Dynamics.Nav.Client.exe
+RegRead, CurrentFin, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\fin.exe
+RegRead, CurrentFinSQL, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\finsql.exe
+;Find version from Files
+FileGetVersion, CurrentDynNavVersion, %CurrentDynNav%
+FileGetVersion, CurrentFinVersion, %CurrentFin%
+FileGetVersion, CurrentFinSQLVersion, %CurrentFinSQL%
+;Create/Modify entries in ini file
+IniWrite,%CurrentDynNav%,%inifile%,%CurrentDynNavVersion%,Location
+IniWrite,True,%inifile%,%CurrentDynNavVersion%,Active
+IniWrite,%CurrentFin%,%inifile%,%CurrentFinVersion%,Location
+IniWrite,True,%inifile%,%CurrentFinVersion%,Active
+IniWrite,%CurrentFinSQL%,%inifile%,%CurrentFinSQLVersion%,Location
+IniWrite,True,%inifile%,%CurrentFinSQLVersion%,Active
+IniWrite,%CurrentDynNavVersion%,%inifile%,Settings,Microsoft.Dynamics.Nav.Client.exe
+IniWrite,%CurrentFinVersion%,%inifile%,Settings,fin.exe
+IniWrite,%CurrentFinSQLVersion%,%inifile%,Settings,finsql.exe
+Return
 
 #n::
 ;Standard hot-key is Windows button (#) + n (n)
