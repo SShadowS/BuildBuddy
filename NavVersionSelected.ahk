@@ -5,6 +5,10 @@
 ;%A_AppData%		The full path and name of the folder containing the current user's application-specific data. For example: C:\Documents and Settings\Username\Application Data
 ;%A_WinDir%			The Windows directory. For example: C:\Windows
 inifile=%A_MyDocuments%\BuildBubby.ini
+;Mode
+;0=Normal mode
+;1=No registry editing(Debug)
+Mode=0
 
 ;######################################################################################
 ;Editing below this point at your own risk
@@ -33,14 +37,23 @@ if SelectedFile =
 Else
 {
 	MsgBox, You selected:`n%SelectedFile%`nBuild version:`n%FileVersion%
-	IniWrite,%SelectedFile%,%inifile%,%FileVersion%,Location
+	IniRead,IsActive,%inifile%,%FileVersion%,Active
+	If IsActive = ERROR
+	{
+		IniWrite,%SelectedFile%,%inifile%,%FileVersion%,Location
+		IniWrite,False,%inifile%,%FileVersion%,Active
+	}
+	Else
+	{
+		IniWrite,%SelectedFile%,%inifile%,%FileVersion%,Location
+	}
 	GoSub, ReloadMenu
 }
 Return
 
 
 ReloadMenu:
-;Reloads all menu items. Upcomming features: Sorting by buildnumber
+;Reloads all menu items. Upcoming features: Sorting by build number
 Menu, MainMenu, DeleteAll
 GoSub, AddStandardMenuItems
 Loop, read, %inifile%
@@ -49,24 +62,45 @@ Loop, read, %inifile%
 	{
 		StringTrimLeft, MenuNameToAdd, A_LoopReadLine, 1
 		StringTrimRight, MenuNameToAdd, MenuNameToAdd, 1
-		Menu, MainMenu, add, %MenuNameToAdd%, RunClient
+		If MenuNameToAdd != Settings
+		{
+			Menu, MainMenu, add, %MenuNameToAdd%, ModifyRegDB
+			IniRead,FileLocation,%inifile%,%MenuNameToAdd%,Location
+			StringGetPos, PathPos, FileLocation,\,1
+			StringMid, FileName, FileLocation,PathPos+2
+			IniRead,SetActive,%inifile%,Settings,%FileName%
+			If SetActive = %MenuNameToAdd%
+			{
+				Menu, MainMenu, Check, %MenuNameToAdd%
+			}
+		}
 	}
 }
 Return
 
-RunClient:
+ModifyRegDB:
+;Modifies the RegDB
 Menu, MainMenu, Check, %A_ThisMenuItem%
 IniRead, RunThisFile, %inifile%, %A_ThisMenuItem%, Location
 StringGetPos, PathPos, RunThisFile,\,1
 StringMid, FilePath, RunThisFile,1,PathPos+1
 StringMid, FileName, RunThisFile,PathPos+2
-MsgBox, Will edit this key:`n%FileName%`nDefault:`n%RunThisFile%`nPath:`n%FilePath%
-;RegWrite, REG_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Microsoft.Dynamics.Nav.Client.exe, Path, %RunThisFile%
-;If ErrorLevel
-;	MsgBox, Fejl.
-Return
+IniWrite,%A_ThisMenuItem%,%inifile%,Settings,%FileName%
+If Mode = 1
+	MsgBox, Will edit this key:`n%FileName%`nDefault:`n%RunThisFile%`nPath:`n%FilePath%
+Else
+{	
+	RegWrite, REG_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%FileName%,, %RunThisFile%
+	If ErrorLevel
+		MsgBox, Error changing Default key at SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%FileName%.
+	RegWrite, REG_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%FileName%, Path, %FilePath%
+	If ErrorLevel
+		MsgBox, Error changing Path key at SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%FileName%.
+}
+GoSub, ReloadMenu
+;Return
 
 #n::
-;Standard hotkey is Windows button (#) + n (n)
+;Standard hot-key is Windows button (#) + n (n)
 Menu, MainMenu, Show
 Return
