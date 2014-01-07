@@ -5,16 +5,23 @@ All gathered up in a small popup menu.
 
 Standard hotkey: Win+n (Can be changed in the script file)
 
-prerequisite:
-AutoHotkey http://www.autohotkey.com
-Dynamics Nav / Navision
+Prerequisite
+------------
+* [AutoHotkey](http://www.autohotkey.com)
+* Dynamics Nav / Navision
 
-https://github.com/SShadowS/BuildBuddy/blob/master/NavVersionSelected.ahk
-Download BuildBubby.ahk above and run it as admin.
+How to
+------
+1. Download [BuildBubby.ahk](https://github.com/SShadowS/BuildBuddy/blob/master/NavVersionSelected.ahk).
+2. Right click the script and press 'Run as administrator'
 
 Features
-- [x] Save builds to file
-- [x] Dynamic menu
-- [x] Change registry settings
-- [ ] Menu sorting
-- [ ] Menu tree by Navision version
+--------
+- Save builds to file
+- Dynamic menu
+- Change registry settings
+
+On the drawing board
+--------------------
+- Menu sorting
+- Menu tree by Navision version
