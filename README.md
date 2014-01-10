@@ -5,7 +5,7 @@ All gathered up in a small popup menu.
 
 Standard hotkey: Win+n (Can be changed in the script file)
 
-![Screenshot](/screenshot.png "Screenshot")
+![Screenshot](./Screenshot.png "Screenshot")
 
 Prerequisite
 ------------
