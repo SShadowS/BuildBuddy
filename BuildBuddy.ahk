@@ -24,9 +24,29 @@ Return
 ;------------ End of auto-execute section ------------
 
 AddStandardMenuItems:
+;Find current versions from RegDB
+RegRead, CurrentDynNav, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Microsoft.Dynamics.Nav.Client.exe
+RegRead, CurrentFin, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\fin.exe
+RegRead, CurrentFinSQL, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\finsql.exe
+;Find version from Files
+FileGetVersion, CurrentDynNavVersion, %CurrentDynNav%
+FileGetVersion, CurrentFinVersion, %CurrentFin%
+FileGetVersion, CurrentFinSQLVersion, %CurrentFinSQL%
+;Current active versions
+Menu, MainMenu, add, Microsoft.Dynamics.Nav.Client.exe = %CurrentDynNavVersion%, Dummy
+Menu, MainMenu, add, fin.exe = %CurrentFinVersion%, Dummy
+Menu, MainMenu, add, finsql.exe = %CurrentFinSQLVersion%, Dummy
+;Gray out
+Menu, MainMenu, Disable, Microsoft.Dynamics.Nav.Client.exe = %CurrentDynNavVersion%
+Menu, MainMenu, Disable, fin.exe = %CurrentFinVersion%
+Menu, MainMenu, Disable, finsql.exe = %CurrentFinSQLVersion%
+Menu, MainMenu, add
 ;Stock menu entries
 Menu, MainMenu, add, Add version to INI, AddVersion
 ;Menu, MainMenu, add, ReloadMenu, ReloadMenu
+Return
+
+Dummy:
 Return
 
 AddVersion:
