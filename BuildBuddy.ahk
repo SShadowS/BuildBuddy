@@ -19,7 +19,6 @@ GoSub, FindCurrentVersion
 Menu, MainMenu, add, Dummy, ReloadMenu ;Dummy menu entry else DeleteAll fails.
 GoSub, ReloadMenu
 
-;------------ End of auto-execute section ------------
 Return
 ;------------ End of auto-execute section ------------
 
